@@ -21,7 +21,7 @@ contract ZombieFactory {        //建立名为“ZombieFactory（僵尸工厂）
     //private - 只能在当前合约内访问，在继承合约中都不可访问。
 
 
-    function _createZombie(string _name, uint _dna) private {       //建立函数“_createZombie（创建僵尸）”，函数参数包括“name”和“dna”，函数状态为私有（只能在当前合约内访问）
+    function _createZombie(string _name, uint _dna) private {       //建立函数“_createZombie（创建僵尸）”，函数参数包括“_name”和“_dna”，函数状态为私有（只能在当前合约内访问）
         uint id = zombies.push(Zombie(_name, _dna)) - 1;            //定义僵尸id，具体方法见下方拆分操作
             //上一行代码内容可拆分如下：
             //Zombie aZombie = Zombie(_name, _dna)；                    //创建结构体“Zombie”类型的结构，将其名称定义为“aZombie”，其“name”和“dna”来自函数的参数“_name”和“_dna”
@@ -30,14 +30,14 @@ contract ZombieFactory {        //建立名为“ZombieFactory（僵尸工厂）
         emit NewZombie(id, _name, _dna);                            //此处触发事件“NewZombie”
     }
 
-    function _generateRandomDna(string _str) private view returns (uint) {
-        uint rand = uint(keccak256(abi.encodePacked(_str)));
-        return rand % dnaModulus;
+    function _generateRandomDna(string _str) private view returns (uint) {          //建立函数“_generateRandomDna（生成随机DNA）”，参数为字符类型（string）的“_str”，函数状态为私有，包含数据类型为uint的返回值
+                                                                                    //函数定义为“view”（只能读取数据不能更改数据），另一种函数定义为“pure”（函数不读取应用里的状态，返回值完全取决于输入参数）
+        uint rand = uint(keccak256(abi.encodePacked(_str)));                        //使用keccak256散列函数生成伪随机十六进制数，存入“rand”，并将十六进制数转换为十进制的uint（abi.encodePacked对给定参数执行紧打包编码，是更准确的计算方法）
+        return rand % dnaModulus;                                                   //将数值rand对之前定义的“dnaModulus”进行取模，使其位数不超过16位
     }
 
-    function createRandomZombie(string _name) public {
-        uint randDna = _generateRandomDna(_name);
-        _createZombie(_name, randDna);
-    }
+    function createRandomZombie(string _name) public {                              //建立函数“createRandomZombie（创建随机僵尸）”，参数为字符类型（string）的“_name”，函数状态为公开
+        uint randDna = _generateRandomDna(_name);                                   //调用“_generateRandomDna”函数，返回randDna
+        _createZombie(_name, randDna);                                              //调用“_createZombie”函数
 
 }
